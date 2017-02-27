@@ -11,6 +11,7 @@ import { clickBackground } from '../actions/app-actions';
 import Logo from '../components/logo';
 import NodesChartElements from './nodes-chart-elements';
 import { getActiveTopologyOptions, zoomCacheKey } from '../utils/topology-utils';
+import Marker from './marker';
 
 import { topologyZoomState } from '../selectors/nodes-chart-zoom';
 import { layoutWithSelectedNode } from '../selectors/nodes-chart-focus';
@@ -111,7 +112,11 @@ class NodesChart extends React.Component {
       <div className="nodes-chart">
         <svg
           width="100%" height="100%" id="nodes-chart-canvas"
-          className={svgClassNames} onClick={this.handleMouseClick}>
+          className={svgClassNames} onClick={this.handleMouseClick}
+        >
+          <defs>
+            <Marker />
+          </defs>
           <g transform="translate(24,24) scale(0.25)">
             <Logo />
           </g>

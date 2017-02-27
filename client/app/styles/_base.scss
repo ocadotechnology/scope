@@ -498,6 +498,10 @@
     stroke-width: $node-border-stroke-width * 0.8;
   }
 
+  .edge-marker {
+    color: $text-secondary-color;
+    fill: $text-secondary-color;
+  }
 }
 
 .matched-results {
