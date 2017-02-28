@@ -80,21 +80,24 @@ func updateFilters(rpt report.Report, topologies []APITopologyDesc) []APITopolog
 		ns = append(ns, namespace)
 	}
 	sort.Strings(ns)
-	for i, t := range topologies {
-		if t.id == podsID || t.id == servicesID || t.id == deploymentsID || t.id == replicaSetsID {
-			topologies[i] = updateTopologyFilters(t, []APITopologyOptionGroup{
-				kubernetesFilters(ns...), unmanagedFilter,
-			})
+	if len(ns) > 0 {
+		// We only want to apply k8s filters if any k8s info is present
+		for i, t := range topologies {
+			if t.id == containersID || t.id == containersByImageID || t.id == containersByHostnameID || t.id == podsID || t.id == servicesID || t.id == deploymentsID || t.id == replicaSetsID {
+				topologies[i] = mergeTopologyFilters(t, []APITopologyOptionGroup{
+					kubernetesFilters(ns...),
+				})
+			}
 		}
 	}
 	return topologies
 }
 
-// updateTopologyFilters recursively sets the options on a topology description
-func updateTopologyFilters(t APITopologyDesc, options []APITopologyOptionGroup) APITopologyDesc {
-	t.Options = options
+// mergeTopologyFilters recursively merges in new options on a topology description
+func mergeTopologyFilters(t APITopologyDesc, options []APITopologyOptionGroup) APITopologyDesc {
+	t.Options = append(t.Options, options...)
 	for i, sub := range t.SubTopologies {
-		t.SubTopologies[i] = updateTopologyFilters(sub, options)
+		t.SubTopologies[i] = mergeTopologyFilters(sub, options)
 	}
 	return t
 }
@@ -200,6 +203,7 @@ func MakeRegistry() *Registry {
 			renderer:    render.PodRenderer,
 			Name:        "Pods",
 			Rank:        3,
+			Options:     []APITopologyOptionGroup{unmanagedFilter},
 			HideIfEmpty: true,
 		},
 		APITopologyDesc{
@@ -207,6 +211,7 @@ func MakeRegistry() *Registry {
 			parent:      podsID,
 			renderer:    render.ReplicaSetRenderer,
 			Name:        "replica sets",
+			Options:     []APITopologyOptionGroup{unmanagedFilter},
 			HideIfEmpty: true,
 		},
 		APITopologyDesc{
@@ -214,6 +219,7 @@ func MakeRegistry() *Registry {
 			parent:      podsID,
 			renderer:    render.DeploymentRenderer,
 			Name:        "deployments",
+			Options:     []APITopologyOptionGroup{unmanagedFilter},
 			HideIfEmpty: true,
 		},
 		APITopologyDesc{
@@ -221,6 +227,7 @@ func MakeRegistry() *Registry {
 			parent:      podsID,
 			renderer:    render.PodServiceRenderer,
 			Name:        "services",
+			Options:     []APITopologyOptionGroup{unmanagedFilter},
 			HideIfEmpty: true,
 		},
 		APITopologyDesc{

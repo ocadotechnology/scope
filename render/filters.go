@@ -293,7 +293,14 @@ func IsNotPseudo(n report.Node) bool {
 // IsNamespace checks if the node is a pod/service in the specified namespace
 func IsNamespace(namespace string) FilterFunc {
 	return func(n report.Node) bool {
-		gotNamespace, _ := n.Latest.Lookup(kubernetes.Namespace)
+		try_keys := []string{kubernetes.Namespace, docker.LabelPrefix + "io.kubernetes.pod.namespace"}
+		gotNamespace := ""
+		for _, key := range try_keys {
+			if value, ok := n.Latest.Lookup(key); ok {
+				gotNamespace = value
+				break
+			}
+		}
 		return namespace == gotNamespace
 	}
 }
