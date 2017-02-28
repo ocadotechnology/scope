@@ -22,7 +22,14 @@ export function initEdgesFromNodes(nodes) {
         // The direction source->target is important since dagre takes
         // directionality into account when calculating the layout.
         const edgeId = constructEdgeId(source, target);
-        const edge = makeMap({ id: edgeId, value: 1, source, target });
+        const shapeName = node.get('shape').concat(node.get('stack') ? '-stacked' : '');
+        const edge = makeMap({
+          id: edgeId,
+          value: 1,
+          source,
+          target,
+          targetShape: shapeName
+        });
         edges = edges.set(edgeId, edge);
       }
     });
