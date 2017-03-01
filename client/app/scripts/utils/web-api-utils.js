@@ -348,3 +348,7 @@ export function getPipeStatus(pipeId, dispatch) {
     }
   });
 }
+
+export function stopTopologyPolling() {
+  clearTimeout(topologyTimer);
+}

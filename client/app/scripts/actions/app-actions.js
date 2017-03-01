@@ -8,7 +8,7 @@ import { parseQuery } from '../utils/search-utils';
 import { bufferDeltaUpdate, resumeUpdate,
   resetUpdateBuffer } from '../utils/update-buffer-utils';
 import { doControlRequest, getAllNodes, getNodesDelta, getNodeDetails,
-  getTopologies, deletePipe } from '../utils/web-api-utils';
+  getTopologies, deletePipe, stopTopologyPolling } from '../utils/web-api-utils';
 import { getActiveTopologyOptions,
   getCurrentTopologyUrl } from '../utils/topology-utils';
 import { storageSet } from '../utils/storage-utils';
@@ -273,7 +273,7 @@ export function clickNode(nodeId, label, origin) {
   };
 }
 
-export function clickPauseUpdate() {
+export function pauseUpdates() {
   return {
     type: ActionTypes.CLICK_PAUSE_UPDATE
   };
@@ -714,5 +714,12 @@ export function changeInstance() {
       dispatch,
       true // forces websocket teardown and reconnect to new instance
     );
+  };
+}
+
+export function stopUpdates() {
+  return (dispatch) => {
+    stopTopologyPolling();
+    dispatch(pauseUpdates());
   };
 }
